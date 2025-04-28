@@ -78,8 +78,8 @@ function loadTVModel() {
       'tv.obj', // OBJファイルのパス
       (object) => {
         // ロードされたオブジェクトの設定
-        object.scale.set(0.8, 0.8, 0.8); // サイズを大きく調整
-        object.position.set(0, 0.5, 0);  // 位置を上に調整
+        object.scale.set(2, 2, 2); // サイズを大きく調整
+        object.position.set(0, 10, 0);  // 位置を上に調整
         
         // オブジェクト内のメッシュに影を設定
         object.traverse((child) => {
@@ -267,6 +267,11 @@ loader.load(
 // マガジンモーダルの要素を取得
 const magazineModal = document.getElementById('magazine-modal');
 const closeButton = document.getElementById('close-magazine');
+
+// 初期状態でマガジンモーダルを必ず非表示にする
+if (magazineModal) {
+  magazineModal.style.display = 'none';
+}
 
 // モーダルを閉じる処理
 if (closeButton) {
