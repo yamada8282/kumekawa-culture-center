@@ -48,8 +48,18 @@ cube.position.set(0, 0.5, 0);
 cube.castShadow = true;
 scene.add(cube);
 
+// マガジンを表示するオブジェクト（目印として赤いキューブを追加）
+const magazineMarkerGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
+const magazineMarkerMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+const magazineMarker = new THREE.Mesh(magazineMarkerGeometry, magazineMarkerMaterial);
+magazineMarker.position.set(1.5, 0.5, 0);
+magazineMarker.castShadow = true;
+magazineMarker.userData.isMagazineMarker = true; // マーカーであることを示すフラグ
+scene.add(magazineMarker);
+
 // クリック可能なメッシュを格納する配列
 const clickableMeshes = [];
+clickableMeshes.push(magazineMarker); // マガジンマーカーを追加
 
 // GLTFローダーでルームモデルをロード
 const loader = new GLTFLoader();
@@ -71,6 +81,14 @@ loader.load(
         
         // 各メッシュに識別用のユーザーデータを追加
         node.userData.meshName = node.name || `部屋の一部（${clickableMeshes.length}）`;
+        
+        // マガジンを表示するメッシュを指定（例：名前に「magazine」や「book」を含むメッシュ）
+        // 注意: 実際のモデルの内容によって条件を調整してください
+        if (node.name && (node.name.toLowerCase().includes('magazine') || 
+                          node.name.toLowerCase().includes('book') ||
+                          node.name.toLowerCase().includes('desk'))) {
+          node.userData.ismagazinePoint = true;
+        }
       }
     });
     
@@ -84,6 +102,24 @@ loader.load(
     console.error('モデルの読み込みに失敗しました', error);
   }
 );
+
+// マガジンモーダルの要素を取得
+const magazineModal = document.getElementById('magazine-modal');
+const closeButton = document.getElementById('close-magazine');
+
+// モーダルを閉じる処理
+if (closeButton) {
+  closeButton.addEventListener('click', () => {
+    magazineModal.style.display = 'none';
+  });
+}
+
+// マガジンを表示する関数
+function showMagazine() {
+  if (magazineModal) {
+    magazineModal.style.display = 'flex';
+  }
+}
 
 // Raycasterとマウス位置の設定
 const raycaster = new THREE.Raycaster();
@@ -108,6 +144,14 @@ window.addEventListener('click', (event) => {
       return;
     }
     
+    // マガジンマーカーまたはマガジンポイントをクリックした場合
+    if (hitObject === magazineMarker || 
+        (hitObject.userData && hitObject.userData.ismagazinePoint)) {
+      showInfo('マガジンが表示できます');
+      showMagazine();
+      return;
+    }
+    
     // クリックされたメッシュがモデルの一部である場合
     if (clickableMeshes.includes(hitObject)) {
       const meshName = hitObject.userData.meshName;
@@ -122,6 +166,20 @@ window.addEventListener('click', (event) => {
         hitObject.material.emissive = new THREE.Color(0x000000);
       }, 2000);
     }
+  }
+});
+
+// モーダル外のクリックでも閉じられるようにする
+window.addEventListener('click', (event) => {
+  if (event.target === magazineModal) {
+    magazineModal.style.display = 'none';
+  }
+});
+
+// ESCキーでモーダルを閉じる
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && magazineModal.style.display === 'flex') {
+    magazineModal.style.display = 'none';
   }
 });
 
@@ -151,6 +209,9 @@ function animate() {
   // キューブを回転させる
   cube.rotation.x += 0.01;
   cube.rotation.y += 0.01;
+  
+  // マガジンマーカーを回転させる
+  magazineMarker.rotation.y += 0.02;
   
   // コントロールを更新
   controls.update();
