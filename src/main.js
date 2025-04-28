@@ -49,6 +49,11 @@ const clickableMeshes = [];
 let tvMesh;
 loadTVModel();
 
+// カメラの初期位置とFOVを保存
+const initialCameraPosition = new THREE.Vector3(0, 1.6, 3);
+const initialCameraTarget = new THREE.Vector3(0, 0, 0);
+const initialCameraFov = 75;
+
 // カメラアニメーションの状態を管理
 let cameraAnimation = {
   enabled: false,
@@ -277,6 +282,8 @@ if (magazineModal) {
 if (closeButton) {
   closeButton.addEventListener('click', () => {
     magazineModal.style.display = 'none';
+    // カメラを元の位置に戻す
+    resetCameraPosition();
   });
 }
 
@@ -342,6 +349,8 @@ window.addEventListener('click', (event) => {
 window.addEventListener('click', (event) => {
   if (event.target === magazineModal) {
     magazineModal.style.display = 'none';
+    // カメラを元の位置に戻す
+    resetCameraPosition();
   }
 });
 
@@ -349,6 +358,8 @@ window.addEventListener('click', (event) => {
 window.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && magazineModal.style.display === 'flex') {
     magazineModal.style.display = 'none';
+    // カメラを元の位置に戻す
+    resetCameraPosition();
   }
 });
 
@@ -447,6 +458,27 @@ function moveCamera(targetObject) {
   cameraAnimation.enabled = true;
   cameraAnimation.startTime = Date.now();
   cameraAnimation.targetObject = targetObject;
+  
+  // カメラ移動中はコントロールを一時的に無効化
+  controls.enabled = false;
+}
+
+// カメラを元の位置に戻す関数
+function resetCameraPosition() {
+  // 現在のカメラの位置とコントロールのターゲットを保存
+  cameraAnimation.startPosition.copy(camera.position);
+  cameraAnimation.startTarget.copy(controls.target);
+  cameraAnimation.startFov = camera.fov;
+  
+  // 元の位置に戻す
+  cameraAnimation.endPosition.copy(initialCameraPosition);
+  cameraAnimation.endTarget.copy(initialCameraTarget);
+  cameraAnimation.endFov = initialCameraFov;
+  
+  // アニメーションの状態を設定
+  cameraAnimation.enabled = true;
+  cameraAnimation.startTime = Date.now();
+  cameraAnimation.duration = 1500; // 少し長めのアニメーション時間
   
   // カメラ移動中はコントロールを一時的に無効化
   controls.enabled = false;
