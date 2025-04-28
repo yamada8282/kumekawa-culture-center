@@ -49,6 +49,20 @@ const clickableMeshes = [];
 let tvMesh;
 loadTVModel();
 
+// カメラアニメーションの状態を管理
+let cameraAnimation = {
+  enabled: false,
+  startPosition: new THREE.Vector3(),
+  startTarget: new THREE.Vector3(),
+  endPosition: new THREE.Vector3(),
+  endTarget: new THREE.Vector3(),
+  startTime: 0,
+  duration: 1000, // ミリ秒単位でのアニメーション時間
+  targetObject: null,
+  startFov: 75,   // 開始時の視野角
+  endFov: 45      // 終了時の視野角（小さいほどズーム効果）
+};
+
 function loadTVModel() {
   // OBJファイルローダーの作成
   const objLoader = new OBJLoader();
@@ -64,8 +78,8 @@ function loadTVModel() {
       'tv.obj', // OBJファイルのパス
       (object) => {
         // ロードされたオブジェクトの設定
-        object.scale.set(0.5, 0.5, 0.5); // 適切なサイズに調整
-        object.position.set(0, 0, 0);    // 位置を設定
+        object.scale.set(0.8, 0.8, 0.8); // サイズを大きく調整
+        object.position.set(0, 0.5, 0);  // 位置を上に調整
         
         // オブジェクト内のメッシュに影を設定
         object.traverse((child) => {
@@ -114,8 +128,8 @@ function loadTVModel() {
     objLoader.load(
       'tv.obj',
       (object) => {
-        object.scale.set(0.5, 0.5, 0.5);
-        object.position.set(0, 0, 0);
+        object.scale.set(0.8, 0.8, 0.8); // サイズを大きく調整
+        object.position.set(0, 0.5, 0);  // 位置を上に調整
         
         object.traverse((child) => {
           if (child.isMesh) {
@@ -170,33 +184,36 @@ function loadTVModel() {
 function createBasicTVModel() {
   console.log('基本的なTVモデルを作成します');
   
-  // テレビの台座（箱）を作成
-  const tvStandGeometry = new THREE.BoxGeometry(1.2, 0.1, 0.6);
+  // 高さをオフセット（すべてのコンポーネントの高さを調整）
+  const heightOffset = 0.5;
+  
+  // テレビの台座（箱）を作成 - サイズを大きく
+  const tvStandGeometry = new THREE.BoxGeometry(1.5, 0.12, 0.8);
   const tvStandMaterial = new THREE.MeshStandardMaterial({ color: 0x333333 });
   const tvStand = new THREE.Mesh(tvStandGeometry, tvStandMaterial);
-  tvStand.position.set(0, 0.05, 0);
+  tvStand.position.set(0, 0.06 + heightOffset, 0);
   tvStand.castShadow = true;
   tvStand.receiveShadow = true;
   scene.add(tvStand);
   
-  // テレビの本体（箱）を作成
-  const tvBodyGeometry = new THREE.BoxGeometry(1, 0.6, 0.1);
+  // テレビの本体（箱）を作成 - サイズを大きく
+  const tvBodyGeometry = new THREE.BoxGeometry(1.3, 0.8, 0.12);
   const tvBodyMaterial = new THREE.MeshStandardMaterial({ color: 0x222222 });
   const tvBody = new THREE.Mesh(tvBodyGeometry, tvBodyMaterial);
-  tvBody.position.set(0, 0.4, 0);
+  tvBody.position.set(0, 0.5 + heightOffset, 0);
   tvBody.castShadow = true;
   tvBody.receiveShadow = true;
   scene.add(tvBody);
   
-  // テレビの画面を作成
-  const tvScreenGeometry = new THREE.PlaneGeometry(0.9, 0.5);
+  // テレビの画面を作成 - サイズを大きく
+  const tvScreenGeometry = new THREE.PlaneGeometry(1.2, 0.7);
   const tvScreenMaterial = new THREE.MeshBasicMaterial({ 
     color: 0x0077cc,
     emissive: 0x0077cc,
     emissiveIntensity: 0.5
   });
   const tvScreen = new THREE.Mesh(tvScreenGeometry, tvScreenMaterial);
-  tvScreen.position.set(0, 0.4, 0.06);
+  tvScreen.position.set(0, 0.5 + heightOffset, 0.07);
   scene.add(tvScreen);
   
   // テレビモデルをクリック可能に
@@ -286,7 +303,15 @@ window.addEventListener('click', (event) => {
     if (hitObject === tvMesh || 
         (hitObject.userData && hitObject.userData.isTVScreen)) {
       showInfo('テレビ画面 - マガジンが表示できます');
-      showMagazine();
+      
+      // カメラをTVに移動させる
+      moveCamera(hitObject);
+      
+      // 少し遅延してからマガジンを表示
+      setTimeout(() => {
+        showMagazine();
+      }, 800);
+      
       return;
     }
     
@@ -345,10 +370,81 @@ window.addEventListener('resize', () => {
 function animate() {
   requestAnimationFrame(animate);
   
-  // コントロールを更新
-  controls.update();
+  // カメラアニメーションの更新
+  if (cameraAnimation.enabled) {
+    const elapsed = Date.now() - cameraAnimation.startTime;
+    const progress = Math.min(elapsed / cameraAnimation.duration, 1);
+    
+    // イージング関数（滑らかな加速と減速）
+    const easedProgress = easeInOutCubic(progress);
+    
+    // カメラの位置を補間
+    camera.position.lerpVectors(
+      cameraAnimation.startPosition,
+      cameraAnimation.endPosition,
+      easedProgress
+    );
+    
+    // コントロールのターゲットを補間
+    controls.target.lerpVectors(
+      cameraAnimation.startTarget,
+      cameraAnimation.endTarget,
+      easedProgress
+    );
+    
+    // FOV（視野角）を補間してズーム効果を追加
+    camera.fov = cameraAnimation.startFov * (1 - easedProgress) + cameraAnimation.endFov * easedProgress;
+    
+    // カメラの更新
+    camera.updateProjectionMatrix();
+    controls.update();
+    
+    // アニメーション終了チェック
+    if (progress >= 1) {
+      cameraAnimation.enabled = false;
+      controls.enabled = true; // コントロールを再有効化
+    }
+  } else {
+    // 通常のコントロール更新
+    controls.update();
+  }
   
   renderer.render(scene, camera);
+}
+
+// イージング関数（滑らかな加速と減速）
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+// カメラをターゲットオブジェクトに移動させる関数
+function moveCamera(targetObject) {
+  // 現在のカメラの位置とコントロールのターゲットを保存
+  cameraAnimation.startPosition.copy(camera.position);
+  cameraAnimation.startTarget.copy(controls.target);
+  cameraAnimation.startFov = camera.fov;
+  
+  // 対象オブジェクトの位置とバウンディングボックスを取得
+  const targetPosition = new THREE.Vector3();
+  targetObject.getWorldPosition(targetPosition);
+  
+  // 対象オブジェクトの方向にカメラを移動（少し距離を取る）
+  const direction = new THREE.Vector3().subVectors(camera.position, targetPosition).normalize();
+  cameraAnimation.endPosition.copy(targetPosition).add(direction.multiplyScalar(1.5)); // 距離を少し短く
+  
+  // 高さを少し上げる（y座標を調整）
+  cameraAnimation.endPosition.y += 0.2;
+  
+  // 対象位置を設定
+  cameraAnimation.endTarget.copy(targetPosition);
+  
+  // アニメーションの状態を設定
+  cameraAnimation.enabled = true;
+  cameraAnimation.startTime = Date.now();
+  cameraAnimation.targetObject = targetObject;
+  
+  // カメラ移動中はコントロールを一時的に無効化
+  controls.enabled = false;
 }
 
 animate(); 
