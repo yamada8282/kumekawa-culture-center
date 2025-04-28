@@ -1,0 +1,18 @@
+{
+  "newFiles": {
+    "enforceRules": [
+      {
+        "pattern": "**/*.js",
+        "prepend": "\"use strict\";\n"
+      }
+    ]
+  },
+  "imports": {
+    "three": {
+      "pattern": "import * as THREE from 'three';"
+    },
+    "utils": {
+      "pattern": "import { ${entity} } from '@/utils/${entity}';"
+    }
+  }
+} 
