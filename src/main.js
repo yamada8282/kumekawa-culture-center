@@ -78,8 +78,8 @@ function loadTVModel() {
       'tv.obj', // OBJファイルのパス
       (object) => {
         // ロードされたオブジェクトの設定
-        object.scale.set(2, 2, 2); // サイズを大きく調整
-        object.position.set(0, 10, 0);  // 位置を上に調整
+        object.scale.set(0.5, 0.5, 0.5); // 元のサイズに戻す
+        object.position.set(0, 0, 0);    // 元の位置に戻す
         
         // オブジェクト内のメッシュに影を設定
         object.traverse((child) => {
@@ -128,8 +128,8 @@ function loadTVModel() {
     objLoader.load(
       'tv.obj',
       (object) => {
-        object.scale.set(0.8, 0.8, 0.8); // サイズを大きく調整
-        object.position.set(0, 0.5, 0);  // 位置を上に調整
+        object.scale.set(0.5, 0.5, 0.5); // 元のサイズに戻す
+        object.position.set(0, 0, 0);    // 元の位置に戻す
         
         object.traverse((child) => {
           if (child.isMesh) {
