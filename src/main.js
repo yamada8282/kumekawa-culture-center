@@ -2,6 +2,8 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 // シーンのセットアップ
@@ -40,26 +42,169 @@ directionalLight.position.set(5, 5, 5);
 directionalLight.castShadow = true;
 scene.add(directionalLight);
 
-// キューブの作成（サンプルオブジェクト）
-const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
-cube.position.set(0, 0.5, 0);
-cube.castShadow = true;
-scene.add(cube);
-
-// マガジンを表示するオブジェクト（目印として赤いキューブを追加）
-const magazineMarkerGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
-const magazineMarkerMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-const magazineMarker = new THREE.Mesh(magazineMarkerGeometry, magazineMarkerMaterial);
-magazineMarker.position.set(1.5, 0.5, 0);
-magazineMarker.castShadow = true;
-magazineMarker.userData.isMagazineMarker = true; // マーカーであることを示すフラグ
-scene.add(magazineMarker);
-
 // クリック可能なメッシュを格納する配列
 const clickableMeshes = [];
-clickableMeshes.push(magazineMarker); // マガジンマーカーを追加
+
+// TVモデルを読み込む
+let tvMesh;
+loadTVModel();
+
+function loadTVModel() {
+  // OBJファイルローダーの作成
+  const objLoader = new OBJLoader();
+  
+  // オプション: マテリアルファイルがある場合はロード
+  const mtlLoader = new MTLLoader();
+  mtlLoader.load('tv.mtl', (materials) => {
+    materials.preload();
+    
+    objLoader.setMaterials(materials);
+    // OBJファイルをロード
+    objLoader.load(
+      'tv.obj', // OBJファイルのパス
+      (object) => {
+        // ロードされたオブジェクトの設定
+        object.scale.set(0.5, 0.5, 0.5); // 適切なサイズに調整
+        object.position.set(0, 0, 0);    // 位置を設定
+        
+        // オブジェクト内のメッシュに影を設定
+        object.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+            
+            // テレビ画面に該当するメッシュを検出
+            // 実際のモデルに合わせて条件を調整する必要があります
+            if (child.name.toLowerCase().includes('screen') || 
+                child.material.name?.toLowerCase().includes('screen')) {
+              tvMesh = child;
+              tvMesh.userData.isTVScreen = true;
+              tvMesh.userData.meshName = "テレビ画面";
+            }
+            
+            // すべてのメッシュをクリック可能に
+            clickableMeshes.push(child);
+          }
+        });
+        
+        // テレビ画面が特定できなかった場合は、最初のメッシュをテレビ画面とする
+        if (!tvMesh && object.children.length > 0) {
+          tvMesh = object.children[0];
+          tvMesh.userData.isTVScreen = true;
+          tvMesh.userData.meshName = "テレビ";
+        }
+        
+        scene.add(object);
+        console.log('TVモデルがロードされました');
+      },
+      // 読み込み進捗の処理
+      (xhr) => {
+        console.log((xhr.loaded / xhr.total * 100) + '% TVモデルをロード中');
+      },
+      // エラー処理
+      (error) => {
+        console.error('TVモデルのロードに失敗しました', error);
+        // エラー時のフォールバック：基本的なボックスを表示
+        createBasicTVModel();
+      }
+    );
+  }, undefined, (error) => {
+    console.error('MTLファイルのロードに失敗しました', error);
+    // MTLファイルなしでOBJをロード
+    objLoader.load(
+      'tv.obj',
+      (object) => {
+        object.scale.set(0.5, 0.5, 0.5);
+        object.position.set(0, 0, 0);
+        
+        object.traverse((child) => {
+          if (child.isMesh) {
+            // デフォルトのマテリアルを設定
+            child.material = new THREE.MeshStandardMaterial({ 
+              color: 0x333333,
+              roughness: 0.5,
+              metalness: 0.5
+            });
+            
+            child.castShadow = true;
+            child.receiveShadow = true;
+            
+            if (!tvMesh) {
+              tvMesh = child;
+              tvMesh.userData.isTVScreen = true;
+              tvMesh.userData.meshName = "テレビ";
+            }
+            
+            clickableMeshes.push(child);
+          }
+        });
+        
+        scene.add(object);
+        console.log('TVモデルがロードされました（マテリアルなし）');
+      },
+      (xhr) => {
+        console.log((xhr.loaded / xhr.total * 100) + '% TVモデルをロード中');
+      },
+      (error) => {
+        console.error('TVモデルのロードに失敗しました', error);
+        createBasicTVModel();
+      }
+    );
+  });
+  
+  // 地面を作成
+  const floorGeometry = new THREE.PlaneGeometry(10, 10);
+  const floorMaterial = new THREE.MeshStandardMaterial({ 
+    color: 0xeeeeee,
+    roughness: 0.8,
+    metalness: 0.2
+  });
+  const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+  floor.rotation.x = -Math.PI / 2;
+  floor.position.y = 0;
+  floor.receiveShadow = true;
+  scene.add(floor);
+}
+
+// OBJファイルのロードに失敗した場合のフォールバック
+function createBasicTVModel() {
+  console.log('基本的なTVモデルを作成します');
+  
+  // テレビの台座（箱）を作成
+  const tvStandGeometry = new THREE.BoxGeometry(1.2, 0.1, 0.6);
+  const tvStandMaterial = new THREE.MeshStandardMaterial({ color: 0x333333 });
+  const tvStand = new THREE.Mesh(tvStandGeometry, tvStandMaterial);
+  tvStand.position.set(0, 0.05, 0);
+  tvStand.castShadow = true;
+  tvStand.receiveShadow = true;
+  scene.add(tvStand);
+  
+  // テレビの本体（箱）を作成
+  const tvBodyGeometry = new THREE.BoxGeometry(1, 0.6, 0.1);
+  const tvBodyMaterial = new THREE.MeshStandardMaterial({ color: 0x222222 });
+  const tvBody = new THREE.Mesh(tvBodyGeometry, tvBodyMaterial);
+  tvBody.position.set(0, 0.4, 0);
+  tvBody.castShadow = true;
+  tvBody.receiveShadow = true;
+  scene.add(tvBody);
+  
+  // テレビの画面を作成
+  const tvScreenGeometry = new THREE.PlaneGeometry(0.9, 0.5);
+  const tvScreenMaterial = new THREE.MeshBasicMaterial({ 
+    color: 0x0077cc,
+    emissive: 0x0077cc,
+    emissiveIntensity: 0.5
+  });
+  const tvScreen = new THREE.Mesh(tvScreenGeometry, tvScreenMaterial);
+  tvScreen.position.set(0, 0.4, 0.06);
+  scene.add(tvScreen);
+  
+  // テレビモデルをクリック可能に
+  tvMesh = tvScreen;
+  tvMesh.userData.isTVScreen = true;
+  tvMesh.userData.meshName = "テレビ画面";
+  clickableMeshes.push(tvMesh);
+}
 
 // GLTFローダーでルームモデルをロード
 const loader = new GLTFLoader();
@@ -82,12 +227,11 @@ loader.load(
         // 各メッシュに識別用のユーザーデータを追加
         node.userData.meshName = node.name || `部屋の一部（${clickableMeshes.length}）`;
         
-        // マガジンを表示するメッシュを指定（例：名前に「magazine」や「book」を含むメッシュ）
-        // 注意: 実際のモデルの内容によって条件を調整してください
-        if (node.name && (node.name.toLowerCase().includes('magazine') || 
-                          node.name.toLowerCase().includes('book') ||
-                          node.name.toLowerCase().includes('desk'))) {
-          node.userData.ismagazinePoint = true;
+        // TVに関連するメッシュを見つけた場合
+        if (node.name && (node.name.toLowerCase().includes('tv') || 
+                         node.name.toLowerCase().includes('television') ||
+                         node.name.toLowerCase().includes('screen'))) {
+          node.userData.isTVScreen = true;
         }
       }
     });
@@ -138,16 +282,10 @@ window.addEventListener('click', (event) => {
   if (intersects.length > 0) {
     const hitObject = intersects[0].object;
     
-    // サンプルキューブをクリックした場合
-    if (hitObject === cube) {
-      showInfo('サンプルキューブ');
-      return;
-    }
-    
-    // マガジンマーカーまたはマガジンポイントをクリックした場合
-    if (hitObject === magazineMarker || 
-        (hitObject.userData && hitObject.userData.ismagazinePoint)) {
-      showInfo('マガジンが表示できます');
+    // TVの画面をクリックした場合、マガジンを表示
+    if (hitObject === tvMesh || 
+        (hitObject.userData && hitObject.userData.isTVScreen)) {
+      showInfo('テレビ画面 - マガジンが表示できます');
       showMagazine();
       return;
     }
@@ -158,13 +296,14 @@ window.addEventListener('click', (event) => {
       showInfo(meshName);
       
       // クリックされたオブジェクトを少し強調表示（色を変更）
-      const originalColor = hitObject.material.color.clone();
-      hitObject.material.emissive = new THREE.Color(0x333333);
-      
-      // 2秒後に元の状態に戻す
-      setTimeout(() => {
-        hitObject.material.emissive = new THREE.Color(0x000000);
-      }, 2000);
+      if (hitObject.material && hitObject.material.emissive) {
+        hitObject.material.emissive = new THREE.Color(0x333333);
+        
+        // 2秒後に元の状態に戻す
+        setTimeout(() => {
+          hitObject.material.emissive = new THREE.Color(0x000000);
+        }, 2000);
+      }
     }
   }
 });
@@ -205,13 +344,6 @@ window.addEventListener('resize', () => {
 // アニメーションループ
 function animate() {
   requestAnimationFrame(animate);
-  
-  // キューブを回転させる
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
-  
-  // マガジンマーカーを回転させる
-  magazineMarker.rotation.y += 0.02;
   
   // コントロールを更新
   controls.update();
