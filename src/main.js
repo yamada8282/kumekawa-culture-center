@@ -477,11 +477,11 @@ loader.load(
         node.castShadow = true;
         node.receiveShadow = true;
         
-        // すべてのメッシュをクリック可能リストに追加
-        clickableMeshes.push(node);
+        // 部屋のメッシュはクリック不可にする（表示のみ）
+        // clickableMeshes.push(node); // コメントアウト
         
         // 各メッシュに識別用のユーザーデータを追加
-        node.userData.meshName = node.name || `部屋の一部（${clickableMeshes.length}）`;
+        node.userData.meshName = node.name || `部屋の一部（非クリック）`;
         
         // iMacに関連するメッシュを見つけた場合
         if (node.name && (node.name.toLowerCase().includes('imac') || 
@@ -800,8 +800,8 @@ window.addEventListener('click', (event) => {
         console.log('📋 ホワイトボードクリック → Contact表示');
         showContact();
       } 
-      // iMacの場合、Worksモーダルを表示
-      else if (meshName && (meshName.includes('iMac') || meshName.includes('mesh_0'))) {
+      // iMacの場合のみ、Worksモーダルを表示
+      else if (meshName && meshName.includes('iMac')) {
         console.log('💻 iMacクリック → Works表示');
         showWorks();
       }
