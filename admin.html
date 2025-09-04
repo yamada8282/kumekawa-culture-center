@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>クメカル - 管理画面</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      min-height: 100vh;
+      color: white;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .header h1 {
+      color: #4fc3f7;
+      margin-bottom: 10px;
+    }
+    
+    .login-form {
+      max-width: 400px;
+      margin: 0 auto;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 30px;
+      border-radius: 10px;
+      margin-top: 20vh;
+    }
+    
+    .login-form input {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 15px;
+      border: 1px solid #444;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 16px;
+    }
+    
+    .login-form input:focus {
+      outline: none;
+      border-color: #4fc3f7;
+    }
+    
+    .login-form button {
+      width: 100%;
+      padding: 15px;
+      background: #4fc3f7;
+      color: #000;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    .login-form button:hover {
+      background: #29b6f6;
+    }
+    
+    .admin-panel {
+      display: none;
+    }
+    
+    .works-list {
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .work-item {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #4fc3f7;
+    }
+    
+    .work-item h3 {
+      color: #4fc3f7;
+      margin-bottom: 10px;
+    }
+    
+    .work-item .tags {
+      margin-top: 10px;
+    }
+    
+    .tag {
+      background: #4fc3f7;
+      color: #000;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+      margin-right: 5px;
+    }
+    
+    .add-form {
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      color: #4fc3f7;
+      font-weight: bold;
+    }
+    
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #444;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-family: inherit;
+    }
+    
+    .form-group input:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: #4fc3f7;
+    }
+    
+    .form-group textarea {
+      height: 100px;
+      resize: vertical;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      margin-right: 10px;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: #4fc3f7;
+      color: #000;
+    }
+    
+    .btn-primary:hover {
+      background: #29b6f6;
+    }
+    
+    .btn-danger {
+      background: #f44336;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #d32f2f;
+    }
+    
+    .error {
+      color: #f44336;
+      text-align: center;
+      margin-top: 10px;
+    }
+    
+    .success {
+      color: #4caf50;
+      text-align: center;
+      margin-top: 10px;
+    }
+    
+    .logout-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #f44336;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- ログイン画面 -->
+  <div id="login-screen">
+    <div class="login-form">
+      <h2 style="text-align: center; margin-bottom: 20px; color: #4fc3f7;">管理画面ログイン</h2>
+      <input type="password" id="password" placeholder="パスワードを入力" maxlength="4">
+      <button onclick="login()">ログイン</button>
+      <div id="login-error" class="error"></div>
+    </div>
+  </div>
+
+  <!-- 管理画面 -->
+  <div id="admin-panel" class="admin-panel">
+    <button class="logout-btn" onclick="logout()">ログアウト</button>
+    
+    <div class="container">
+      <div class="header">
+        <h1>Works管理画面</h1>
+        <p>作品の追加・編集・削除ができます</p>
+      </div>
+
+      <!-- 新規追加フォーム -->
+      <div class="add-form">
+        <h2 style="color: #4fc3f7; margin-bottom: 15px;">新しい作品を追加</h2>
+        <div class="form-group">
+          <label for="title">タイトル</label>
+          <input type="text" id="title" placeholder="作品のタイトル">
+        </div>
+        <div class="form-group">
+          <label for="description">説明</label>
+          <textarea id="description" placeholder="作品の説明"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="tags">タグ（カンマ区切り）</label>
+          <input type="text" id="tags" placeholder="例: Three.js, WebGL, JavaScript">
+        </div>
+        <div class="form-group">
+          <label for="image">画像URL（オプション）</label>
+          <input type="text" id="image" placeholder="画像のURL">
+        </div>
+        <button class="btn btn-primary" onclick="addWork()">作品を追加</button>
+        <div id="add-message"></div>
+      </div>
+
+      <!-- 既存作品一覧 -->
+      <div class="works-list">
+        <h2 style="color: #4fc3f7; margin-bottom: 15px;">既存作品一覧</h2>
+        <div id="works-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let works = [];
+
+    // ログイン処理
+    function login() {
+      const password = document.getElementById('password').value;
+      const errorDiv = document.getElementById('login-error');
+      
+      if (password === '0000') {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-panel').style.display = 'block';
+        loadWorks();
+      } else {
+        errorDiv.textContent = 'パスワードが間違っています';
+        document.getElementById('password').value = '';
+      }
+    }
+
+    // ログアウト処理
+    function logout() {
+      document.getElementById('login-screen').style.display = 'block';
+      document.getElementById('admin-panel').style.display = 'none';
+      document.getElementById('password').value = '';
+      document.getElementById('login-error').textContent = '';
+    }
+
+    // Enterキーでログイン
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('password').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          login();
+        }
+      });
+    });
+
+    // Works データを読み込み
+    async function loadWorks() {
+      try {
+        const response = await fetch('works.json');
+        works = await response.json();
+        displayWorks();
+      } catch (error) {
+        console.error('Works読み込みエラー:', error);
+      }
+    }
+
+    // Works表示
+    function displayWorks() {
+      const container = document.getElementById('works-container');
+      container.innerHTML = '';
+
+      works.forEach(work => {
+        const workDiv = document.createElement('div');
+        workDiv.className = 'work-item';
+        workDiv.innerHTML = `
+          <h3>${work.title}</h3>
+          <p>${work.description}</p>
+          <div class="tags">
+            ${work.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+          </div>
+          <p style="margin-top: 10px; color: #aaa; font-size: 12px;">ID: ${work.id} | 日付: ${work.date}</p>
+          <div style="margin-top: 10px;">
+            <button class="btn btn-danger" onclick="deleteWork(${work.id})">削除</button>
+          </div>
+        `;
+        container.appendChild(workDiv);
+      });
+    }
+
+    // 新しい作品を追加
+    function addWork() {
+      const title = document.getElementById('title').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const tagsInput = document.getElementById('tags').value.trim();
+      const image = document.getElementById('image').value.trim();
+      const messageDiv = document.getElementById('add-message');
+
+      if (!title || !description) {
+        messageDiv.innerHTML = '<div class="error">タイトルと説明は必須です</div>';
+        return;
+      }
+
+      const tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag);
+      const newWork = {
+        id: Date.now(), // 簡易的なID生成
+        title: title,
+        description: description,
+        tags: tags,
+        date: new Date().toISOString().split('T')[0],
+        image: image
+      };
+
+      works.push(newWork);
+      saveWorks();
+      displayWorks();
+
+      // フォームをクリア
+      document.getElementById('title').value = '';
+      document.getElementById('description').value = '';
+      document.getElementById('tags').value = '';
+      document.getElementById('image').value = '';
+
+      messageDiv.innerHTML = '<div class="success">作品を追加しました！</div>';
+      setTimeout(() => messageDiv.innerHTML = '', 3000);
+    }
+
+    // 作品を削除
+    function deleteWork(id) {
+      if (confirm('この作品を削除しますか？')) {
+        works = works.filter(work => work.id !== id);
+        saveWorks();
+        displayWorks();
+      }
+    }
+
+    // Works データを保存（注意: 実際のプロジェクトでは適切なバックエンドAPI使用）
+    function saveWorks() {
+      // ブラウザのlocalStorageに保存（デモ用）
+      localStorage.setItem('worksData', JSON.stringify(works));
+      
+      // 実際の実装では、サーバーAPIにPOSTリクエストを送信
+      console.log('Works data saved:', works);
+      
+      // works.jsonファイルの更新が必要な場合は、
+      // サーバーサイドスクリプトが必要
+    }
+  </script>
+</body>
+</html>

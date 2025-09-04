@@ -9,30 +9,254 @@
       margin: 0; 
       overflow: hidden; 
       font-family: 'Noto Sans JP', sans-serif;
+      background: white;
     }
     canvas { 
       display: block; 
     }
     #info {
+      display: none !important;
+    }
+    #fps-instructions {
       position: absolute;
-      top: 20px;
+      bottom: 20px;
       left: 20px;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.8);
       color: white;
-      padding: 10px;
-      border-radius: 5px;
+      padding: 15px;
+      border-radius: 8px;
       font-family: 'Noto Sans JP', sans-serif;
+      font-size: 14px;
+      z-index: 15;
+      line-height: 1.5;
+    }
+    #fps-instructions h3 {
+      margin: 0 0 10px 0;
+      color: #4fc3f7;
+    }
+    
+    /* Works & Contact Modal共通スタイル */
+    #works-modal, #contact-modal {
       display: none;
-      z-index: 10;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+    }
+
+    #works-modal .modal-content, #contact-modal .modal-content {
+      background-color: rgba(0, 0, 0, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 30px;
+      color: white;
+    }
+
+    #works-modal .close, #contact-modal .close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      z-index: 10002;
+    }
+
+    #works-modal .close:hover, #contact-modal .close:hover {
+      color: #4fc3f7;
+    }
+
+    /* Works Modal Styles */
+    .works-content {
+      max-height: 70vh;
+      overflow-y: auto;
+      padding: 20px 0;
+    }
+    
+    .work-item {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      border-left: 4px solid #4fc3f7;
+    }
+    
+    .work-item h3 {
+      color: #4fc3f7;
+      margin: 0 0 10px 0;
+    }
+    
+    .work-item p {
+      line-height: 1.6;
+      margin: 10px 0;
+    }
+    
+    .work-tags {
+      margin-top: 15px;
+    }
+    
+    .tag {
+      background: #4fc3f7;
+      color: #000;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-right: 8px;
+      margin-bottom: 5px;
+      display: inline-block;
+    }
+    
+    /* Contact Modal Styles */
+    .contact-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+    
+    .contact-info h3, .contact-form h3 {
+      color: #4fc3f7;
+      margin-bottom: 20px;
+    }
+    
+    .contact-method {
+      margin-bottom: 20px;
+    }
+    
+    .contact-method h4 {
+      color: #fff;
+      margin: 0 0 5px 0;
+      font-size: 16px;
+    }
+    
+    .contact-method p {
+      margin: 0;
+      line-height: 1.5;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      color: #fff;
+    }
+    
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #333;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      box-sizing: border-box;
+    }
+    
+    .form-group input:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: #4fc3f7;
+      background: rgba(255, 255, 255, 0.15);
+    }
+    
+    .submit-btn {
+      background: #4fc3f7;
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    
+    .submit-btn:hover {
+      background: #29b6f6;
+    }
+    
+    @media (max-width: 768px) {
+      .contact-content {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* ローディング画面 */
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+      color: #333;
+      font-family: 'Noto Sans JP', sans-serif;
+    }
+    
+    .loading-logo {
+      width: 120px;
+      height: auto;
+      margin-bottom: 30px;
+      filter: invert(1);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(0, 0, 0, 0.1);
+      border-top: 3px solid #333;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    
+    .loading-progress {
+      font-size: 14px;
+      color: #666;
     }
     #logo {
       position: absolute;
       top: 20px;
       left: 20px;
-      color: #fff;
-      font-size: 24px;
-      font-weight: bold;
       z-index: 20;
+      width: auto;
+      height: 80px;
+    }
+    
+    #logo img {
+      height: 100%;
+      width: auto;
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.7));
     }
     .menu {
       position: absolute;
@@ -58,29 +282,18 @@
       color: #000;
     }
     
-    /* マガジンモーダルのスタイル */
-    #magazine-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 100;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: auto;
-      pointer-events: auto;
-    }
+    /* マガジンモーダルのスタイルを削除 */
     
     .modal-content {
-      background-color: rgba(0, 0, 0, 0);
+      background-color: rgba(0, 0, 0, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
       width: 80%;
       max-width: 800px;
       max-height: 90%;
       overflow: auto;
       position: relative;
+      z-index: 10001;
     }
     
     .modal-header {
@@ -109,111 +322,106 @@
       cursor: pointer;
       color: #fff;
       text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+      z-index: 10002;
     }
     
-    #magazine-modal.show {
-      display: flex;
-    }
+    /* magazine-modal.show スタイルを削除 */
     
-    /* ブログ風スタイル */
-    .blog-post {
-      margin-bottom: 30px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-      padding-bottom: 20px;
-    }
-    
-    .blog-meta {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
-    
-    .blog-post h3 {
-      margin: 0 0 15px 0;
-      color: #fff;
-      text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
-    }
-    
-    .blog-content {
-      line-height: 1.6;
-      color: #fff;
-      text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
-    }
-    
-    .blog-tag {
-      display: inline-block;
-      background: rgba(255, 255, 255, 0.2);
-      padding: 3px 8px;
-      border-radius: 3px;
-      font-size: 12px;
-      margin-right: 5px;
-      color: #fff;
-    }
+    /* ブログ風スタイルを削除 */
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- ローディング画面 -->
+  <div id="loading-screen">
+    <img src="クメカルロゴ（白透過） 1.svg" alt="クメカル" class="loading-logo">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">読み込み中...</div>
+    <div class="loading-progress" id="loading-progress">0%</div>
+  </div>
+
   <div id="info"></div>
-  <div id="logo">久米川カルチャーセンター</div>
-  
-  <div class="menu">
-    <a href="#">HOME</a>
-    <a href="#">ABOUT</a>
-    <a href="#">WORKS</a>
-    <a href="#">CONTACT</a>
+  <div id="logo">
+    <img src="クメカルロゴ（白透過） 1.svg" alt="クメカル">
   </div>
   
-  <!-- マガジンモーダル -->
-  <div id="magazine-modal">
+  <div id="fps-instructions">
+    <h3>操作方法</h3>
+    <strong>二本指スワイプ</strong> - 視点回転<br>
+    <strong>クリック</strong> - オブジェクト操作
+  </div>
+  
+  <!-- メニューを削除 -->
+  
+  <!-- マガジンモーダルを削除 -->
+
+  <!-- Works Modal -->
+  <div id="works-modal" class="modal" style="display: none;">
     <div class="modal-content">
-      <div class="modal-header">
-        <h2>今月の久米カルマガジン</h2>
-        <span class="close-button" id="close-magazine">&times;</span>
+      <span class="close" id="close-works">&times;</span>
+      <h2>WORKS</h2>
+      <div class="works-content" id="works-content">
+        <!-- 作品はJSONから動的に読み込まれます -->
       </div>
-      <div class="modal-body">
-        <!-- ブログ風コンテンツ -->
-        <div class="blog-post">
-          <div class="blog-meta">2023年8月15日 | カテゴリ：イベント</div>
-          <h3>夏の特別ワークショップ「デジタルアートと伝統文化の融合」開催レポート</h3>
-          <div class="blog-content">
-            <p>8月10日に開催された夏の特別ワークショップ「デジタルアートと伝統文化の融合」には、多くの方にご参加いただきました。参加者の皆さんは、VR技術を用いた日本画の制作を体験し、伝統的な技法とデジタル技術の新しい可能性を探求しました。</p>
-            <p>講師を務めた山田先生は「デジタル技術は伝統文化を制限するものではなく、むしろその魅力を広げる可能性を秘めています」と語りました。</p>
-            <p>次回は9月に「3Dスキャンで甦る古民家」をテーマにワークショップを開催予定です。お楽しみに！</p>
-            <div>
-              <span class="blog-tag">ワークショップ</span>
-              <span class="blog-tag">デジタルアート</span>
-              <span class="blog-tag">日本画</span>
-            </div>
+    </div>
+  </div>
+
+  <!-- Contact Modal -->
+  <div id="contact-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close" id="close-contact">&times;</span>
+      <h2>CONTACT</h2>
+      <div class="contact-content">
+        <div class="contact-info">
+          <h3>お問い合わせ</h3>
+          <p>プロジェクトのご相談やコラボレーションのお話など、お気軽にご連絡ください。</p>
+          
+          <div class="contact-method">
+            <h4>📧 Email</h4>
+            <p>kumegawaculturecenter@gmail.com</p>
+          </div>
+          
+          <div class="contact-method">
+            <h4>📞 電話</h4>
+            <p>042-XXX-XXXX</p>
+          </div>
+          
+          <div class="contact-method">
+            <h4>📍 住所</h4>
+            <p>〒189-XXXX<br>東京都東村山市久米川町X-X-X<br>久米川カルチャーセンター</p>
+          </div>
+          
+          <div class="contact-method">
+            <h4>🕒 営業時間</h4>
+            <p>平日: 9:00 - 18:00<br>土日: 10:00 - 17:00<br>祝日: 休業</p>
           </div>
         </div>
         
-        <div class="blog-post">
-          <div class="blog-meta">2023年8月5日 | カテゴリ：お知らせ</div>
-          <h3>新しい3D展示「都市と自然」が始まります</h3>
-          <div class="blog-content">
-            <p>久米川カルチャーセンター2階ギャラリースペースにて、8月15日から9月30日まで、3D空間展示「都市と自然」を開催します。この展示では、都市化が進む久米川エリアの過去と現在を3Dモデルで表現し、地域の変遷を体験できます。</p>
-            <p>また、当センターのウェブサイトでもバーチャルツアーを公開予定ですので、遠方の方もぜひお楽しみください。</p>
-            <div>
-              <span class="blog-tag">展示</span>
-              <span class="blog-tag">3Dモデル</span>
-              <span class="blog-tag">地域文化</span>
+        <div class="contact-form">
+          <h3>メッセージを送る</h3>
+          <form>
+            <div class="form-group">
+              <label for="name">お名前</label>
+              <input type="text" id="name" name="name" required>
             </div>
-          </div>
-        </div>
-        
-        <div class="blog-post">
-          <div class="blog-meta">2023年7月25日 | カテゴリ：インタビュー</div>
-          <h3>デジタルアーティスト鈴木さんに聞く「文化とテクノロジー」</h3>
-          <div class="blog-content">
-            <p>今月は、デジタルアーティストの鈴木一郎さんをお招きし、文化とテクノロジーの関係についてお話を伺いました。</p>
-            <p>「テクノロジーは文化を伝える新しい手段を提供してくれます。特に若い世代にとって、デジタル技術は伝統文化に触れる入り口になり得ます」と鈴木さん。</p>
-            <p>インタビューの全文は、カルチャーセンター受付で配布している冊子でもお読みいただけます。</p>
-            <div>
-              <span class="blog-tag">インタビュー</span>
-              <span class="blog-tag">デジタルアート</span>
-              <span class="blog-tag">文化</span>
+            
+            <div class="form-group">
+              <label for="email">メールアドレス</label>
+              <input type="email" id="email" name="email" required>
             </div>
-          </div>
+            
+            <div class="form-group">
+              <label for="subject">件名</label>
+              <input type="text" id="subject" name="subject" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="message">メッセージ</label>
+              <textarea id="message" name="message" rows="5" required></textarea>
+            </div>
+            
+            <button type="submit" class="submit-btn">送信</button>
+          </form>
         </div>
       </div>
     </div>
