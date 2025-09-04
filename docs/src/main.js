@@ -687,6 +687,9 @@ function displayWorksInModal(works) {
       <div class="work-tags">
         ${work.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
       </div>
+      ${work.url ? `<div class="work-url">
+        <a href="${work.url}" target="_blank" rel="noopener noreferrer">プロジェクトを見る</a>
+      </div>` : ''}
       <div style="margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.7);">
         ${work.date}
       </div>

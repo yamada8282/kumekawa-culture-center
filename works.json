@@ -5,7 +5,8 @@
     "description": "Three.jsを使用したインタラクティブな3D空間の構築。ユーザーがバーチャル空間で自由に移動し、オブジェクトと相互作用できる環境を制作しました。",
     "tags": ["Three.js", "WebGL", "JavaScript"],
     "date": "2023-12-01",
-    "image": ""
+    "image": "",
+    "url": "https://example.com/webvr-project"
   },
   {
     "id": 2,
@@ -13,7 +14,8 @@
     "description": "WebARを活用したモバイルアプリケーション。カメラを通して現実世界にデジタルオブジェクトを配置し、ユーザーが直感的に操作できるインターフェースを実装。",
     "tags": ["WebAR", "React", "Computer Vision"],
     "date": "2023-11-15",
-    "image": ""
+    "image": "",
+    "url": "https://github.com/yamada8282/ar-application"
   },
   {
     "id": 3,
@@ -21,6 +23,7 @@
     "description": "センサーを使用したインタラクティブなデジタルアート作品。観客の動きに反応して視覚効果が変化し、参加型の芸術体験を提供します。",
     "tags": ["Processing", "Arduino", "Sensors"],
     "date": "2023-10-20",
-    "image": ""
+    "image": "",
+    "url": ""
   }
 ]

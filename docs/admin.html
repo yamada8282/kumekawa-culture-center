@@ -246,6 +246,10 @@
           <label for="image">画像URL（オプション）</label>
           <input type="text" id="image" placeholder="画像のURL">
         </div>
+        <div class="form-group">
+          <label for="url">プロジェクトURL（オプション）</label>
+          <input type="text" id="url" placeholder="例: https://github.com/username/project">
+        </div>
         <button class="btn btn-primary" onclick="addWork()">作品を追加</button>
         <div id="add-message"></div>
       </div>
@@ -333,6 +337,7 @@
       const description = document.getElementById('description').value.trim();
       const tagsInput = document.getElementById('tags').value.trim();
       const image = document.getElementById('image').value.trim();
+      const url = document.getElementById('url').value.trim();
       const messageDiv = document.getElementById('add-message');
 
       if (!title || !description) {
@@ -347,7 +352,8 @@
         description: description,
         tags: tags,
         date: new Date().toISOString().split('T')[0],
-        image: image
+        image: image,
+        url: url
       };
 
       works.push(newWork);
@@ -359,6 +365,7 @@
       document.getElementById('description').value = '';
       document.getElementById('tags').value = '';
       document.getElementById('image').value = '';
+      document.getElementById('url').value = '';
 
       messageDiv.innerHTML = '<div class="success">作品を追加しました！</div>';
       setTimeout(() => messageDiv.innerHTML = '', 3000);
