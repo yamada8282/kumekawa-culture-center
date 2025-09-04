@@ -259,6 +259,31 @@
       font-size: 14px;
       color: #666;
     }
+    
+    /* BGMコントロール */
+    #bgm-controls {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 25;
+    }
+    
+    #bgm-toggle {
+      background: rgba(0, 0, 0, 0.5);
+      border: none;
+      color: white;
+      font-size: 20px;
+      padding: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    
+    #bgm-toggle:hover {
+      background: rgba(0, 0, 0, 0.7);
+      transform: scale(1.1);
+    }
     #logo {
       position: absolute;
       top: 20px;
@@ -347,6 +372,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- BGM -->
+  <audio id="bgm" loop preload="auto">
+    <source src="bgm.wav" type="audio/wav">
+    <source src="bgm.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
   <!-- ローディング画面 -->
   <div id="loading-screen">
     <img src="クメカルロゴ（白透過） 1.svg" alt="クメカル" class="loading-logo">
@@ -358,6 +390,11 @@
   <div id="info"></div>
   <div id="logo">
     <img src="クメカルロゴ（白透過） 1.svg" alt="クメカル">
+  </div>
+  
+  <!-- BGM音量調整 -->
+  <div id="bgm-controls">
+    <button id="bgm-toggle" onclick="toggleBGM()">🔊</button>
   </div>
   
   <div id="fps-instructions">

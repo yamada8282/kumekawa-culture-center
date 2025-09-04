@@ -132,8 +132,142 @@ function hideLoadingScreen() {
     loadingScreen.style.transition = 'opacity 0.5s ease-out';
     setTimeout(() => {
       loadingScreen.style.display = 'none';
+      // ローディング完了後にBGMを開始
+      startBGM();
     }, 500);
   }
+}
+
+// BGM関連の機能
+let bgmAudio = null;
+let bgmFadeInterval = null;
+
+// BGMを開始する関数
+function startBGM() {
+  bgmAudio = document.getElementById('bgm');
+  
+  if (bgmAudio) {
+    // 初期ボリュームを0に設定
+    bgmAudio.volume = 0;
+    
+    // BGMを再生開始
+    const playPromise = bgmAudio.play();
+    
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          console.log('🎵 BGM再生開始');
+          // 徐々にボリュームを上げる（3秒かけて0.3まで）
+          fadeInBGM(0.3, 3000);
+        })
+        .catch(error => {
+          console.log('🎵 BGM自動再生がブロックされました:', error);
+          // ユーザーインタラクション後に再生する準備
+          setupUserInteractionBGM();
+        });
+    }
+  }
+}
+
+// BGMフェードイン関数
+function fadeInBGM(targetVolume = 0.3, duration = 3000) {
+  if (!bgmAudio) return;
+  
+  const steps = 60; // 60ステップで滑らかに
+  const stepDuration = duration / steps;
+  const volumeStep = targetVolume / steps;
+  let currentStep = 0;
+  
+  bgmFadeInterval = setInterval(() => {
+    if (currentStep >= steps) {
+      clearInterval(bgmFadeInterval);
+      bgmAudio.volume = targetVolume;
+      console.log(`🎵 BGMフェードイン完了（ボリューム: ${targetVolume}）`);
+      return;
+    }
+    
+    bgmAudio.volume = volumeStep * currentStep;
+    currentStep++;
+  }, stepDuration);
+}
+
+// ユーザーインタラクション後にBGMを再生
+function setupUserInteractionBGM() {
+  const startBGMOnInteraction = () => {
+    if (bgmAudio && bgmAudio.paused) {
+      bgmAudio.play()
+        .then(() => {
+          console.log('🎵 ユーザーインタラクション後にBGM再生開始');
+          fadeInBGM(0.3, 2000);
+        })
+        .catch(error => {
+          console.log('🎵 BGM再生エラー:', error);
+        });
+    }
+    
+    // イベントリスナーを削除（一度だけ実行）
+    document.removeEventListener('click', startBGMOnInteraction);
+    document.removeEventListener('keydown', startBGMOnInteraction);
+    document.removeEventListener('touchstart', startBGMOnInteraction);
+  };
+  
+  // 各種ユーザーインタラクションでBGM開始
+  document.addEventListener('click', startBGMOnInteraction);
+  document.addEventListener('keydown', startBGMOnInteraction);
+  document.addEventListener('touchstart', startBGMOnInteraction);
+  
+  console.log('🎵 ユーザーインタラクション待機中...');
+}
+
+// BGMオン/オフ切り替え
+function toggleBGM() {
+  if (!bgmAudio) {
+    bgmAudio = document.getElementById('bgm');
+  }
+  
+  const toggleButton = document.getElementById('bgm-toggle');
+  
+  if (bgmAudio.paused) {
+    // BGM再生開始
+    bgmAudio.play()
+      .then(() => {
+        fadeInBGM(0.3, 1000);
+        toggleButton.textContent = '🔊';
+        console.log('🎵 BGMオン');
+      })
+      .catch(error => {
+        console.log('🎵 BGM再生エラー:', error);
+      });
+  } else {
+    // BGM停止
+    fadeOutBGM(() => {
+      bgmAudio.pause();
+      toggleButton.textContent = '🔇';
+      console.log('🎵 BGMオフ');
+    }, 1000);
+  }
+}
+
+// BGMフェードアウト関数
+function fadeOutBGM(callback, duration = 1000) {
+  if (!bgmAudio) return;
+  
+  const steps = 30;
+  const stepDuration = duration / steps;
+  const volumeStep = bgmAudio.volume / steps;
+  let currentStep = 0;
+  
+  const fadeOutInterval = setInterval(() => {
+    if (currentStep >= steps) {
+      clearInterval(fadeOutInterval);
+      bgmAudio.volume = 0;
+      if (callback) callback();
+      return;
+    }
+    
+    bgmAudio.volume = Math.max(0, bgmAudio.volume - volumeStep);
+    currentStep++;
+  }, stepDuration);
 }
 
 // GUI設定を削除（GUIパラメータは使用しないが、初期化で使われる場合があるので値は保持）
