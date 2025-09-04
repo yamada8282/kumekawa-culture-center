@@ -852,24 +852,21 @@ function displayWorksInModal(works) {
   const worksContainer = document.getElementById('works-content');
   
   if (works.length === 0) {
-    worksContainer.innerHTML = '<p>まだ作品が登録されていません。</p>';
+    worksContainer.innerHTML = '<div class="work-item"><p style="text-align: center; color: #666;">まだ作品が登録されていません。</p></div>';
     return;
   }
   
   const worksHTML = works.map(work => `
     <div class="work-item">
+      ${work.image ? `<img src="${work.image}" alt="${work.title}" class="work-image">` : `<div class="work-image" style="background: #f5f5f5; display: flex; align-items: center; justify-content: center; color: #999;">画像なし</div>`}
       <h3>${work.title}</h3>
-      <p>${work.description}</p>
-      ${work.image ? `<img src="${work.image}" alt="${work.title}" style="max-width: 100%; height: auto; margin: 10px 0; border-radius: 4px;">` : ''}
+      <div class="work-subtitle">${work.description}</div>
       <div class="work-tags">
         ${work.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
       </div>
       ${work.url ? `<div class="work-url">
         <a href="${work.url}" target="_blank" rel="noopener noreferrer">${work.url}</a>
       </div>` : ''}
-      <div style="margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.7);">
-        ${work.date}
-      </div>
     </div>
   `).join('');
   

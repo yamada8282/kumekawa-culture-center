@@ -36,7 +36,21 @@
     }
     
     /* Works & Contact Modal共通スタイル */
-    #works-modal, #contact-modal {
+    /* Works Modal - New Design */
+    #works-modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: white;
+      overflow-y: auto;
+    }
+
+    /* Contact Modal - Keep existing style */
+    #contact-modal {
       display: none;
       position: fixed;
       z-index: 10000;
@@ -50,7 +64,16 @@
       align-items: center;
     }
 
-    #works-modal .modal-content, #contact-modal .modal-content {
+    #works-modal .modal-content {
+      background-color: white;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      color: #333;
+      font-family: 'Share Tech Mono', 'FOT-DNP ShueiGoGinStd', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', monospace, sans-serif;
+    }
+
+    #contact-modal .modal-content {
       background-color: rgba(0, 0, 0, 0.9);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
@@ -58,7 +81,38 @@
       color: white;
     }
 
-    #works-modal .close, #contact-modal .close {
+    /* Works Navigation */
+    .works-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      border-bottom: 1px solid #C0C0C0;
+      background: white;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .works-nav .back-btn {
+      color: #333;
+      text-decoration: none;
+      font-size: 16px;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .works-nav .back-btn:hover {
+      color: #666;
+    }
+
+    .works-nav .section-title {
+      color: #333;
+      font-size: 16px;
+      font-weight: normal;
+    }
+
+    #contact-modal .close {
       position: absolute;
       top: 15px;
       right: 20px;
@@ -69,63 +123,82 @@
       z-index: 10002;
     }
 
-    #works-modal .close:hover, #contact-modal .close:hover {
+    #contact-modal .close:hover {
       color: #4fc3f7;
     }
 
-    /* Works Modal Styles */
+    /* Works Content */
     .works-content {
-      max-height: 70vh;
-      overflow-y: auto;
-      padding: 20px 0;
+      padding: 0;
     }
     
     .work-item {
-      margin-bottom: 30px;
-      padding: 20px;
-      background: rgba(255, 255, 255, 0.05);
+      padding: 40px;
+      border-bottom: 1px solid #C0C0C0;
+    }
+
+    .work-item:last-child {
+      border-bottom: none;
+    }
+    
+    .work-image {
+      width: 100%;
+      max-width: 800px;
+      height: 400px;
+      object-fit: cover;
       border-radius: 8px;
-      border-left: 4px solid #4fc3f7;
+      margin-bottom: 30px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
-    
+
     .work-item h3 {
-      color: #4fc3f7;
+      color: #333;
       margin: 0 0 10px 0;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
     }
     
-    .work-item p {
+    .work-subtitle {
+      color: #666;
+      margin: 0 0 20px 0;
+      font-size: 16px;
+      text-align: center;
       line-height: 1.6;
-      margin: 10px 0;
     }
     
     .work-tags {
-      margin-top: 15px;
+      margin: 20px 0;
+      text-align: center;
     }
     
     .tag {
-      background: #4fc3f7;
-      color: #000;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      margin-right: 8px;
-      margin-bottom: 5px;
       display: inline-block;
+      background: #f5f5f5;
+      color: #333;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      margin: 0 8px 8px 0;
+      border: 1px solid #ddd;
     }
-    
+
     .work-url {
-      margin-top: 15px;
+      margin-top: 20px;
+      text-align: center;
     }
-    
+
     .work-url a {
-      color: #4fc3f7;
+      color: #333;
       text-decoration: underline;
       font-size: 14px;
       transition: color 0.3s ease;
     }
-    
+
     .work-url a:hover {
-      color: #29b6f6;
+      color: #666;
     }
     
     /* Contact Modal Styles */
@@ -423,8 +496,10 @@
   <!-- Works Modal -->
   <div id="works-modal" class="modal" style="display: none;">
     <div class="modal-content">
-      <span class="close" id="close-works">&times;</span>
-      <h2>WORKS</h2>
+      <div class="works-nav">
+        <span class="back-btn" id="close-works">←back</span>
+        <span class="section-title">works</span>
+      </div>
       <div class="works-content" id="works-content">
         <!-- 作品はJSONから動的に読み込まれます -->
       </div>
