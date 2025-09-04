@@ -8,7 +8,7 @@
     body { 
       margin: 0; 
       overflow: hidden; 
-      font-family: 'Noto Sans JP', sans-serif;
+      font-family: 'Share Tech Mono', 'FOT-DNP ShueiGoGinStd', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', monospace, sans-serif;
       background: white;
     }
     canvas { 
@@ -25,7 +25,7 @@
       color: white;
       padding: 15px;
       border-radius: 8px;
-      font-family: 'Noto Sans JP', sans-serif;
+      font-family: 'Share Tech Mono', 'FOT-DNP ShueiGoGinStd', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', monospace, sans-serif;
       font-size: 14px;
       z-index: 15;
       line-height: 1.5;
@@ -218,7 +218,7 @@
       align-items: center;
       z-index: 99999;
       color: #333;
-      font-family: 'Noto Sans JP', sans-serif;
+      font-family: 'Share Tech Mono', 'FOT-DNP ShueiGoGinStd', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', monospace, sans-serif;
     }
     
     .loading-logo {
@@ -369,7 +369,20 @@
     
     /* ブログ風スタイルを削除 */
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Google Fonts - Share Tech Mono -->
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  
+  <!-- Adobe Fonts - FOT-DNP ShueiGoGinStd -->
+  <script>
+    (function(d) {
+      var config = {
+        kitId: 'suv2lxg',
+        scriptTimeout: 3000,
+        async: true
+      },
+      h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
+    })(document);
+  </script>
 </head>
 <body>
   <!-- BGM -->
