@@ -180,6 +180,30 @@
       background: #d32f2f;
     }
     
+    .btn-warning {
+      background: #ff9800;
+      color: white;
+    }
+    
+    .btn-warning:hover {
+      background: #f57c00;
+    }
+    
+    .work-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .edit-form {
+      background: rgba(0, 100, 0, 0.1);
+      border: 2px solid #4caf50;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 10px;
+      display: none;
+    }
+    
     .error {
       color: #f44336;
       text-align: center;
@@ -322,9 +346,38 @@
           <div class="tags">
             ${work.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
           </div>
+          ${work.url ? `<p style="color: #4fc3f7; margin-top: 5px;">🔗 <a href="${work.url}" target="_blank" style="color: #4fc3f7;">${work.url}</a></p>` : ''}
           <p style="margin-top: 10px; color: #aaa; font-size: 12px;">ID: ${work.id} | 日付: ${work.date}</p>
-          <div style="margin-top: 10px;">
+          <div class="work-actions">
+            <button class="btn btn-warning" onclick="toggleEditForm(${work.id})">編集</button>
             <button class="btn btn-danger" onclick="deleteWork(${work.id})">削除</button>
+          </div>
+          <div class="edit-form" id="edit-form-${work.id}">
+            <h4 style="color: #4caf50; margin-bottom: 10px;">作品を編集</h4>
+            <div class="form-group">
+              <label>タイトル</label>
+              <input type="text" id="edit-title-${work.id}" value="${work.title}">
+            </div>
+            <div class="form-group">
+              <label>説明</label>
+              <textarea id="edit-description-${work.id}">${work.description}</textarea>
+            </div>
+            <div class="form-group">
+              <label>タグ（カンマ区切り）</label>
+              <input type="text" id="edit-tags-${work.id}" value="${work.tags.join(', ')}">
+            </div>
+            <div class="form-group">
+              <label>画像URL</label>
+              <input type="text" id="edit-image-${work.id}" value="${work.image || ''}">
+            </div>
+            <div class="form-group">
+              <label>プロジェクトURL</label>
+              <input type="text" id="edit-url-${work.id}" value="${work.url || ''}">
+            </div>
+            <div class="work-actions">
+              <button class="btn btn-primary" onclick="saveEdit(${work.id})">保存</button>
+              <button class="btn" onclick="cancelEdit(${work.id})">キャンセル</button>
+            </div>
           </div>
         `;
         container.appendChild(workDiv);
@@ -369,6 +422,70 @@
 
       messageDiv.innerHTML = '<div class="success">作品を追加しました！</div>';
       setTimeout(() => messageDiv.innerHTML = '', 3000);
+    }
+
+    // 編集フォームの表示/非表示を切り替え
+    function toggleEditForm(id) {
+      const editForm = document.getElementById(`edit-form-${id}`);
+      const isVisible = editForm.style.display === 'block';
+      
+      // 他の編集フォームを全て閉じる
+      document.querySelectorAll('.edit-form').forEach(form => {
+        form.style.display = 'none';
+      });
+      
+      // クリックされたフォームの表示を切り替え
+      editForm.style.display = isVisible ? 'none' : 'block';
+    }
+
+    // 編集をキャンセル
+    function cancelEdit(id) {
+      const editForm = document.getElementById(`edit-form-${id}`);
+      editForm.style.display = 'none';
+      
+      // 元の値に戻す
+      const work = works.find(w => w.id === id);
+      if (work) {
+        document.getElementById(`edit-title-${id}`).value = work.title;
+        document.getElementById(`edit-description-${id}`).value = work.description;
+        document.getElementById(`edit-tags-${id}`).value = work.tags.join(', ');
+        document.getElementById(`edit-image-${id}`).value = work.image || '';
+        document.getElementById(`edit-url-${id}`).value = work.url || '';
+      }
+    }
+
+    // 編集を保存
+    function saveEdit(id) {
+      const title = document.getElementById(`edit-title-${id}`).value.trim();
+      const description = document.getElementById(`edit-description-${id}`).value.trim();
+      const tagsInput = document.getElementById(`edit-tags-${id}`).value.trim();
+      const image = document.getElementById(`edit-image-${id}`).value.trim();
+      const url = document.getElementById(`edit-url-${id}`).value.trim();
+
+      if (!title || !description) {
+        alert('タイトルと説明は必須です');
+        return;
+      }
+
+      const tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag);
+      
+      // 該当する作品を更新
+      const workIndex = works.findIndex(work => work.id === id);
+      if (workIndex !== -1) {
+        works[workIndex] = {
+          ...works[workIndex],
+          title: title,
+          description: description,
+          tags: tags,
+          image: image,
+          url: url
+        };
+        
+        saveWorks();
+        displayWorks();
+        
+        alert('作品を更新しました！');
+      }
     }
 
     // 作品を削除
