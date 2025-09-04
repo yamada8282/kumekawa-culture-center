@@ -103,7 +103,7 @@ let whiteboardModel; // GUIで操作するため
 
 // ローディング管理
 let loadingProgress = 0;
-let totalModels = 3; // iMac, Display, Whiteboard
+let totalModels = 4; // Room, iMac, Display, Whiteboard
 let loadedModels = 0;
 
 // ローディング画面を管理
@@ -120,7 +120,7 @@ function updateLoadingProgress() {
     // 全てのモデルが読み込まれたら少し待ってからローディング画面を非表示
     setTimeout(() => {
       hideLoadingScreen();
-    }, 1000);
+    }, 3000);
   }
 }
 
@@ -497,6 +497,7 @@ loader.load(
     console.log(`モデルに含まれるメッシュ数: ${clickableMeshes.length}`);
     console.log('シーンに追加されたオブジェクト数:', scene.children.length);
     console.log('ルーム初期位置:', model.position);
+    updateLoadingProgress(); // ローディング進捗を更新
   },
   (xhr) => {
     console.log(`tamaruroom.glb読み込み進捗: ${(xhr.loaded / xhr.total * 100).toFixed(1)}%`);
@@ -688,7 +689,7 @@ function displayWorksInModal(works) {
         ${work.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
       </div>
       ${work.url ? `<div class="work-url">
-        <a href="${work.url}" target="_blank" rel="noopener noreferrer">プロジェクトを見る</a>
+        <a href="${work.url}" target="_blank" rel="noopener noreferrer">${work.url}</a>
       </div>` : ''}
       <div style="margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.7);">
         ${work.date}
