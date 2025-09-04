@@ -237,8 +237,9 @@ function loadiMacModel() {
             imacMesh.userData.meshName = "iMac画面";
           }
           
-          // 各メッシュに識別用のユーザーデータを追加
-          node.userData.meshName = node.name || `iMacの一部（${clickableMeshes.length}）`;
+          // 各メッシュに識別用のユーザーデータを追加（iMacであることを明示）
+          node.userData.meshName = `iMac_${node.name || 'mesh'}`;
+          console.log('🔧 iMacメッシュ名設定:', node.userData.meshName);
         }
       });
       
@@ -801,8 +802,9 @@ window.addEventListener('click', (event) => {
         showContact();
       } 
       // iMacの場合のみ、Worksモーダルを表示
-      else if (meshName && meshName.includes('iMac')) {
+      else if (meshName && (meshName.includes('iMac') || meshName.includes('mesh01') || meshName.includes('mesh_0'))) {
         console.log('💻 iMacクリック → Works表示');
+        console.log('🔍 検出されたmeshName:', meshName);
         showWorks();
       }
       // その他のオブジェクトは何もしない
