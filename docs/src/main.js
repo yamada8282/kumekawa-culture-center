@@ -805,10 +805,10 @@ window.addEventListener('click', (event) => {
         console.log('💻 iMacクリック → Works表示');
         showWorks();
       }
-      // その他の場合もWorksを表示（フォールバック）
+      // その他のオブジェクトは何もしない
       else {
-        console.log('❓ その他のオブジェクト → Works表示（フォールバック）');
-        showWorks();
+        console.log('❓ その他のオブジェクト → アクションなし');
+        // 強調表示のみ行う（モーダルは表示しない）
       }
       
       // クリックされたオブジェクトを少し強調表示（色を変更）
