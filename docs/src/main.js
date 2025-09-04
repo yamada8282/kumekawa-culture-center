@@ -138,6 +138,27 @@ function hideLoadingScreen() {
   }
 }
 
+// ページロード完了時にもBGMを試行
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🔄 DOMContent読み込み完了 - BGM自動開始を試行');
+  
+  // 少し待ってからBGMを試行
+  setTimeout(() => {
+    const bgm = document.getElementById('bgm');
+    if (bgm && bgm.paused) {
+      bgm.muted = true;
+      bgm.volume = 0;
+      bgm.play()
+        .then(() => {
+          console.log('🎵 DOMContentLoaded後にBGM開始成功');
+        })
+        .catch(() => {
+          console.log('🎵 DOMContentLoaded後のBGM開始失敗');
+        });
+    }
+  }, 100);
+});
+
 // BGM関連の機能
 let bgmAudio = null;
 let bgmFadeInterval = null;
@@ -150,15 +171,24 @@ function startBGM() {
     // 初期ボリュームを0に設定
     bgmAudio.volume = 0;
     
+    // muted状態で再生を試行（自動再生制限を回避）
+    bgmAudio.muted = true;
+    
     // BGMを再生開始
     const playPromise = bgmAudio.play();
     
     if (playPromise !== undefined) {
       playPromise
         .then(() => {
-          console.log('🎵 BGM再生開始');
-          // 徐々にボリュームを上げる（3秒かけて0.3まで）
-          fadeInBGM(0.3, 3000);
+          console.log('🎵 BGM再生開始（ミュート状態）');
+          // 少し待ってからミュートを解除
+          setTimeout(() => {
+            bgmAudio.muted = false;
+            bgmAudio.volume = 0;
+            console.log('🎵 ミュート解除');
+            // 徐々にボリュームを上げる（3秒かけて0.3まで）
+            fadeInBGM(0.3, 3000);
+          }, 500);
         })
         .catch(error => {
           console.log('🎵 BGM自動再生がブロックされました:', error);
@@ -195,6 +225,8 @@ function fadeInBGM(targetVolume = 0.3, duration = 3000) {
 function setupUserInteractionBGM() {
   const startBGMOnInteraction = () => {
     if (bgmAudio && bgmAudio.paused) {
+      bgmAudio.muted = false;
+      bgmAudio.volume = 0;
       bgmAudio.play()
         .then(() => {
           console.log('🎵 ユーザーインタラクション後にBGM再生開始');
@@ -203,18 +235,28 @@ function setupUserInteractionBGM() {
         .catch(error => {
           console.log('🎵 BGM再生エラー:', error);
         });
+    } else if (bgmAudio && !bgmAudio.paused && bgmAudio.muted) {
+      // 既に再生中だがミュート状態の場合
+      bgmAudio.muted = false;
+      bgmAudio.volume = 0;
+      console.log('🎵 ユーザーインタラクション後にミュート解除');
+      fadeInBGM(0.3, 2000);
     }
     
     // イベントリスナーを削除（一度だけ実行）
     document.removeEventListener('click', startBGMOnInteraction);
     document.removeEventListener('keydown', startBGMOnInteraction);
     document.removeEventListener('touchstart', startBGMOnInteraction);
+    document.removeEventListener('mousemove', startBGMOnInteraction);
+    document.removeEventListener('scroll', startBGMOnInteraction);
   };
   
-  // 各種ユーザーインタラクションでBGM開始
+  // 各種ユーザーインタラクションでBGM開始（より多くのイベント）
   document.addEventListener('click', startBGMOnInteraction);
   document.addEventListener('keydown', startBGMOnInteraction);
   document.addEventListener('touchstart', startBGMOnInteraction);
+  document.addEventListener('mousemove', startBGMOnInteraction);
+  document.addEventListener('scroll', startBGMOnInteraction);
   
   console.log('🎵 ユーザーインタラクション待機中...');
 }
