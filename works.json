@@ -1,12 +1,12 @@
 [
   {
     "id": 1,
-    "title": "プロジェクト 1: WebVR体験",
-    "description": "Three.jsを使用したインタラクティブな3D空間の構築。ユーザーがバーチャル空間で自由に移動し、オブジェクトと相互作用できる環境を制作しました。",
-    "tags": ["Three.js", "WebGL", "JavaScript"],
+    "title": "久米川カルチャーセンターweb",
+    "description": "メンバーの音楽を用いたThree.jsのweb site",
+    "tags": ["Web", "Three.js"],
     "date": "2023-12-01",
-    "image": "",
-    "url": "https://example.com/webvr-project"
+    "image": "worksモーダル.png",
+    "url": "https://yamada8282.github.io/kumekawa-culture-center/"
   },
   {
     "id": 2,
